@@ -1486,7 +1486,8 @@ namespace UnityEngine.Rendering.HighDefinition
                             additionalCameraData = camera.gameObject.AddComponent<HDAdditionalCameraData>();
                         additionalCameraData.hasPersistentHistory = true;
 
-                        camera.targetTexture = visibleProbe.realtimeTexture; // We need to set a targetTexture with the right otherwise when setting pixelRect, it will be rescaled internally to the size of the screen
+                        // We need to set a targetTexture with the right otherwise when setting pixelRect, it will be rescaled internally to the size of the screen
+                        camera.targetTexture = visibleProbe.realtimeTexture;
                         camera.gameObject.hideFlags = HideFlags.HideAndDontSave;
                         camera.gameObject.SetActive(false);
                         // Warning: accessing Object.name generate 48B of garbage at each frame here
