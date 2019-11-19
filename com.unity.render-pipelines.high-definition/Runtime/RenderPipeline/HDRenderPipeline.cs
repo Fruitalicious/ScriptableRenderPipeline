@@ -1405,16 +1405,8 @@ namespace UnityEngine.Rendering.HighDefinition
                                 viewerTransform,
                                 Enumerable.Repeat(visibility, 1),
                                 HDUtils.GetSceneCullingMaskFromCamera(visibleInRenderRequest.hdCamera.camera),
-
-                                // We render into a 1:1 texture, so if we want to capture all pixel required
-                                // for another aspect, we need to use the biggests FOV between
-                                // vertical and horizontal FOV
-                                // This allow users to create a new planar reflection and have the reflection
-                                // working without prior setup.
-                                // This is a workaround, the best solution will be to have the same aspect as the viewer camera
-                                // when using planar reflection, but we need an atlas for the planar reflection probe cache
-                                Mathf.Max(1.0f, visibleInRenderRequest.hdCamera.camera.aspect)
-                                    * visibleInRenderRequest.hdCamera.camera.fieldOfView
+                                visibleInRenderRequest.hdCamera.camera.fieldOfView,
+                                visibleInRenderRequest.hdCamera.camera.aspect
                             );
                         }
                     }
@@ -1440,7 +1432,8 @@ namespace UnityEngine.Rendering.HighDefinition
                     Transform viewerTransform,
                     IEnumerable<(int index, float weight)> visibilities,
                     ulong overrideSceneCullingMask,
-                    float referenceFieldOfView = 90
+                    float referenceFieldOfView = 90,
+                    float referenceAspect = 1
                 )
                 {
                     var position = ProbeCapturePositionSettings.ComputeFrom(
@@ -1452,7 +1445,8 @@ namespace UnityEngine.Rendering.HighDefinition
                     HDRenderUtilities.GenerateRenderingSettingsFor(
                         visibleProbe.settings, position,
                         cameraSettings, cameraPositionSettings, overrideSceneCullingMask,
-                        referenceFieldOfView: referenceFieldOfView
+                        referenceFieldOfView: referenceFieldOfView,
+                        referenceAspect: referenceAspect
                     );
 
                     switch (visibleProbe.type)

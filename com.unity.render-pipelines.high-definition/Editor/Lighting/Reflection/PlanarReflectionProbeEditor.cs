@@ -115,8 +115,8 @@ namespace UnityEditor.Rendering.HighDefinition
             if (p.texture == null)
                 return;
 
-            var factor = k_PreviewHeight / p.texture.height;
-            var previewSize = new Rect(p.texture.width * factor, k_PreviewHeight, 0, 0);
+            var previewWidth = k_PreviewHeight;
+            var previewSize = new Rect(previewWidth, k_PreviewHeight + EditorGUIUtility.singleLineHeight + 2, 0, 0);
             
             if (Event.current.type == EventType.Layout
                 || !firstDraw && Event.current.type == EventType.Repaint)
@@ -128,16 +128,30 @@ namespace UnityEditor.Rendering.HighDefinition
                 firstDraw = false;
 
                 var c = new Rect(cameraRect);
-
-                c.width = p.texture.width * factor;
-                c.height = k_PreviewHeight;
+                c.y += EditorGUIUtility.singleLineHeight + 2;
+                if (sceneView.camera.aspect > 1)
+                {
+                    c.width = k_PreviewHeight;
+                    c.height = k_PreviewHeight / sceneView.camera.aspect;
+                    c.y += (k_PreviewHeight - c.height) * 0.5f;
+                }
+                else
+                {
+                    c.width = k_PreviewHeight * sceneView.camera.aspect;
+                    c.height = k_PreviewHeight;
+                    c.x += (k_PreviewHeight - c.width) * 0.5f;
+                }
 
                 // Setup the material to draw the quad with the exposure texture
                 var material = GUITextureBlit2SRGBMaterial;
                 material.SetTexture("_Exposure", exposureTex);
                 Graphics.DrawTexture(c, p.texture, new Rect(0, 0, 1, 1), 0, 0, 0, 0, GUI.color, material, -1);
 
-                var fovRect = new Rect(c.x + 5, c.y + 2, c.width - 10, EditorGUIUtility.singleLineHeight);
+                var fovRect = new Rect(cameraRect);
+                fovRect.x += 5;
+                fovRect.y += 2;
+                fovRect.width -= 10;
+                fovRect.height = EditorGUIUtility.singleLineHeight;
                 GUI.TextField(fovRect, $"FOV: {p.renderData.fieldOfView:F2}°");
             }
         }
