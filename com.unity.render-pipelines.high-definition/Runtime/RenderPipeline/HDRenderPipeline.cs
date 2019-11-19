@@ -1532,7 +1532,8 @@ namespace UnityEngine.Rendering.HighDefinition
                                 camera.projectionMatrix,
                                 camera.transform.position,
                                 camera.transform.rotation,
-                                cameraSettings[j].frustum.fieldOfView
+                                cameraSettings[j].frustum.fieldOfView,
+                                cameraSettings[j].frustum.aspect
                             )
                         );
 

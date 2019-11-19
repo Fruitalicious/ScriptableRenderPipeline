@@ -129,15 +129,15 @@ namespace UnityEditor.Rendering.HighDefinition
 
                 var c = new Rect(cameraRect);
                 c.y += EditorGUIUtility.singleLineHeight + 2;
-                if (sceneView.camera.aspect > 1)
+                if (p.renderData.aspect > 1)
                 {
                     c.width = k_PreviewHeight;
-                    c.height = k_PreviewHeight / sceneView.camera.aspect;
+                    c.height = k_PreviewHeight / p.renderData.aspect;
                     c.y += (k_PreviewHeight - c.height) * 0.5f;
                 }
                 else
                 {
-                    c.width = k_PreviewHeight * sceneView.camera.aspect;
+                    c.width = k_PreviewHeight * p.renderData.aspect;
                     c.height = k_PreviewHeight;
                     c.x += (k_PreviewHeight - c.width) * 0.5f;
                 }
@@ -152,7 +152,12 @@ namespace UnityEditor.Rendering.HighDefinition
                 fovRect.y += 2;
                 fovRect.width -= 10;
                 fovRect.height = EditorGUIUtility.singleLineHeight;
-                GUI.TextField(fovRect, $"FOV: {p.renderData.fieldOfView:F2}°");
+                var width = fovRect.width;
+                fovRect.width = width * 0.5f;
+                GUI.TextField(fovRect, $"F: {p.renderData.fieldOfView:F2}°");
+                fovRect.x += width * 0.5f;
+                fovRect.width = width * 0.5f;
+                GUI.TextField(fovRect, $"A: {p.renderData.aspect:F2}");
             }
         }
 
