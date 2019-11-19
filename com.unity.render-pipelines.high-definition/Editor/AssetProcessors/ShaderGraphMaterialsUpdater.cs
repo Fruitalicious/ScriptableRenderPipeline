@@ -4,6 +4,11 @@ using UnityEditor;
 
 namespace UnityEditor.Rendering.HighDefinition
 {
+    class HDSaveContext : SaveContext
+    {
+        public bool updateMaterials; 
+    }
+
     [InitializeOnLoad]
     public class ShaderGraphMaterialsUpdater
     {
@@ -14,9 +19,17 @@ namespace UnityEditor.Rendering.HighDefinition
             GraphData.onSaveGraph += OnShaderGraphSaved;
         }
 
-        static void OnShaderGraphSaved(Shader shader)
+        static void OnShaderGraphSaved(SaveContext saveContext)
         {
-            shader.IsShaderGraph();
+            var hdSaveContext = saveContext as HDSaveContext;
+
+            // In case the shader is not HDRP
+            if (hdSaveContext == null)
+                return;
+
+            if (!hdSaveContext.updateMaterials)
+                return;
+
             // Iterate all Materials
             string[] materialGuids = AssetDatabase.FindAssets(kMaterialFilter);
             try
@@ -37,7 +50,7 @@ namespace UnityEditor.Rendering.HighDefinition
                     Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
                      // Reset keywords
-                    if (material.shader.name == shader.name)
+                    if (material.shader.name == saveContext.shader.name)
                         HDShaderUtils.ResetMaterialKeywords(material);
 
                     material = null;

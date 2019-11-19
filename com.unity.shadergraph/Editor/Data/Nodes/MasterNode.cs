@@ -45,6 +45,8 @@ namespace UnityEditor.ShaderGraph
             return null;
         }
 
+        public virtual SaveContext GetSaveContext() => new SaveContext();
+
         public virtual void ProcessPreviewMaterial(Material Material) {}
     }
     
