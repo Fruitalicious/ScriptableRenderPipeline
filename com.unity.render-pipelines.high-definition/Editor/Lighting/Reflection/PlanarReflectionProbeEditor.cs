@@ -102,6 +102,8 @@ namespace UnityEditor.Rendering.HighDefinition
 
         void OnOverlayGUI(Object target, SceneView sceneView)
         {
+            // Draw a preview of the captured texture from the planar reflection
+
             // Get the exposure texture used in this scene view
             if (!(RenderPipelineManager.currentPipeline is HDRenderPipeline hdrp))
                 return;
@@ -127,6 +129,10 @@ namespace UnityEditor.Rendering.HighDefinition
                 var cameraRect = GUILayoutUtility.GetRect(previewSize.x, previewSize.y);
                 firstDraw = false;
 
+                // The aspect ratio of the capture texture may not be the aspect of the texture
+                // So we need to stretch back the texture to the aspect used during the capture
+                // to give users a non distorded preview of the capture.
+                // Here we compute a centered rect that has the correct aspect for the texture preview.
                 var c = new Rect(cameraRect);
                 c.y += EditorGUIUtility.singleLineHeight + 2;
                 if (p.renderData.aspect > 1)
@@ -147,6 +153,7 @@ namespace UnityEditor.Rendering.HighDefinition
                 material.SetTexture("_Exposure", exposureTex);
                 Graphics.DrawTexture(c, p.texture, new Rect(0, 0, 1, 1), 0, 0, 0, 0, GUI.color, material, -1);
 
+                // We now display the FoV and aspect used during the capture of the planar reflection
                 var fovRect = new Rect(cameraRect);
                 fovRect.x += 5;
                 fovRect.y += 2;
@@ -217,7 +224,13 @@ namespace UnityEditor.Rendering.HighDefinition
 
             var proxyToWorld = probe.proxyToWorld;
             var settings = probe.settings;
-            var mirrorPosition = proxyToWorld.MultiplyPoint(settings.proxySettings.mirrorPositionProxySpace);
+
+            // When a user creates a new mirror, the capture position is at the exact position of the mirror mesh.
+            // We need to offset slightly the gizmo to avoid a Z-fight in that case, as it looks like a bug
+            // for users discovering the planar reflection.
+            var mirrorPositionProxySpace = settings.proxySettings.mirrorPositionProxySpace + Vector3.up * 0.001f;
+
+            var mirrorPosition = proxyToWorld.MultiplyPoint(mirrorPositionProxySpace);
             var mirrorRotation = proxyToWorld.rotation * settings.proxySettings.mirrorRotationProxySpace * Quaternion.Euler(0, 180, 0);
             var renderData = probe.renderData;
 
