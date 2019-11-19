@@ -112,21 +112,21 @@ ${VFXPassForwardDefine}
 		VFXTransformPSInputs(i);
 		${VFXComputeNormalWS}
 		
-		#if VFX_SHADERGRAPH
-			${VFXAdditionalInterpolantsPreparation}
-			${SHADERGRAPH_PIXEL_CALL_FORWARD}
-
-			#if HAS_SHADERGRAPH_PARAM_COLOR
-				o.color.rgb = OUTSG.${SHADERGRAPH_PARAM_COLOR}.rgb;
-			#endif
-			
-			#if HAS_SHADERGRAPH_PARAM_ALPHA 
-				o.color.a = OUTSG.${SHADERGRAPH_PARAM_ALPHA};
-			#endif
-		#else
-			#define VFX_TEXTURE_COLOR VFXGetTextureColor(VFX_SAMPLER(mainTexture),i)
-			${VFXApplyColor}
-		#endif
+        #if VFX_SHADERGRAPH        
+            ${VFXAdditionalInterpolantsPreparation}
+            ${SHADERGRAPH_PIXEL_CALL_FORWARD}
+            
+            #if HAS_SHADERGRAPH_PARAM_COLOR
+                o.color.rgb = OUTSG.${SHADERGRAPH_PARAM_COLOR}.rgb;
+            #endif
+            
+            #if HAS_SHADERGRAPH_PARAM_ALPHA 
+                o.color.a = OUTSG.${SHADERGRAPH_PARAM_ALPHA};
+            #endif
+        #else
+            #define VFX_TEXTURE_COLOR VFXGetTextureColor(VFX_SAMPLER(mainTexture),i)
+            ${VFXApplyColor}
+        #endif
 
 		o.color = VFXApplyPreExposure(o.color, i);
 		o.color = VFXApplyFog(o.color,i);
