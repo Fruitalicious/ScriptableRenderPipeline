@@ -12,6 +12,6 @@ float SampleSceneDepth(float2 uv)
 
 float LoadSceneDepth(uint2 uv)
 {
-    return LOAD_TEXTURE2D_X(_CameraDepthTexture, UnityStereoTransformScreenSpaceTex(uv)).r;
+    return LOAD_TEXTURE2D_X(_CameraDepthTexture, uv).r;
 }
 #endif
