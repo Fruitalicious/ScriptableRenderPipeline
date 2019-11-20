@@ -1034,16 +1034,19 @@ namespace UnityEditor.Rendering.HighDefinition
             HDLitGUI.SetupMaterialKeywordsAndPass(previewMaterial);
         }
 
-        public override SaveContext GetSaveContext()
+        public override object saveContext
         {
-            int hash = ComputeMaterialNeedsUpdateHash();
+            get
+            {
+                int hash = ComputeMaterialNeedsUpdateHash();
 
-            bool needsUpdate = hash != m_MaterialNeedsUpdateHash;
+                bool needsUpdate = hash != m_MaterialNeedsUpdateHash;
 
-            if (needsUpdate)
-                m_MaterialNeedsUpdateHash = hash;
+                if (needsUpdate)
+                    m_MaterialNeedsUpdateHash = hash;
 
-            return new HDSaveContext{ updateMaterials = needsUpdate };
+                return new HDSaveContext{ updateMaterials = needsUpdate };
+            }
         }
 
         public override void CollectShaderProperties(PropertyCollector collector, GenerationMode generationMode)

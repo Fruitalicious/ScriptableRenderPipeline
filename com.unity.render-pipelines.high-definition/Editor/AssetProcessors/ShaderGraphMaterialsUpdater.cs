@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace UnityEditor.Rendering.HighDefinition
 {
-    class HDSaveContext : SaveContext
+    class HDSaveContext
     {
         public bool updateMaterials; 
     }
@@ -19,12 +19,10 @@ namespace UnityEditor.Rendering.HighDefinition
             GraphData.onSaveGraph += OnShaderGraphSaved;
         }
 
-        static void OnShaderGraphSaved(SaveContext saveContext)
+        static void OnShaderGraphSaved(Shader shader, object saveContext)
         {
-            var hdSaveContext = saveContext as HDSaveContext;
-
             // In case the shader is not HDRP
-            if (hdSaveContext == null)
+            if (!(saveContext is HDSaveContext hdSaveContext))
                 return;
 
             if (!hdSaveContext.updateMaterials)
@@ -50,7 +48,7 @@ namespace UnityEditor.Rendering.HighDefinition
                     Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
                      // Reset keywords
-                    if (material.shader.name == saveContext.shader.name)
+                    if (material.shader.name == shader.name)
                         HDShaderUtils.ResetMaterialKeywords(material);
 
                     material = null;
