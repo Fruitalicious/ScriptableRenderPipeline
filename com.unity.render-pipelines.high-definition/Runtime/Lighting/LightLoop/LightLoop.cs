@@ -1347,12 +1347,12 @@ namespace UnityEngine.Rendering.HighDefinition
             if (lightData.lightType != GPULightType.Directional && lightData.lightType != GPULightType.ProjectorBox)
             {
                 // Store the squared radius of the light to simulate a fill light.
-                lightData.size = new Vector2(additionalLightData.shapeRadius * additionalLightData.shapeRadius, 0);
+                lightData.size = new Vector4(additionalLightData.shapeRadius * additionalLightData.shapeRadius, 0, 0, 0);
             }
 
             if (lightData.lightType == GPULightType.Rectangle || lightData.lightType == GPULightType.Tube)
             {
-                lightData.size = new Vector2(additionalLightData.shapeWidth, additionalLightData.shapeHeight);
+                lightData.size = new Vector4(additionalLightData.shapeWidth, additionalLightData.shapeHeight, Mathf.Cos(additionalLightData.barnDoorAngle * Mathf.PI / 180.0f), additionalLightData.barnDoorLength);
             }
 
             lightData.lightDimmer           = lightDistanceFade * (additionalLightData.lightDimmer);
@@ -1659,7 +1659,7 @@ namespace UnityEngine.Rendering.HighDefinition
                 case PlanarReflectionProbe planarProbe:
                     {
                         if (probe.mode == ProbeSettings.Mode.Realtime
-                            && !hdCamera.frameSettings.IsEnabled(FrameSettingsField.RealtimePlanarReflection))
+                            && !hdCamera.frameSettings.IsEnabled(FrameSettingsField.PlanarProbe))
                             break;
 
                         var fetchIndex = m_TextureCaches.reflectionPlanarProbeCache.FetchSlice(cmd, probe.texture);
