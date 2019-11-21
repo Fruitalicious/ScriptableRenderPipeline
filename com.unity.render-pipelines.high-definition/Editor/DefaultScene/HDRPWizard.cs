@@ -42,8 +42,11 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             public static readonly GUIContent shadowLabel = EditorGUIUtility.TrTextContent("Shadows");
             public const string shadowError = "Shadow must be set to activated! (either on hard or soft)";
             public static readonly GUIContent shadowMaskLabel = EditorGUIUtility.TrTextContent("Shadowmask mode");
+#if !UNITY_2019_3
             public const string shadowMaskError = "Only distance shadowmask supported at the project level! (You can still change this per light.)";
             public static readonly GUIContent scriptingRuntimeVersionLabel = EditorGUIUtility.TrTextContent("Script runtime version");
+#endif
+
             public const string scriptingRuntimeVersionError = "Script runtime version must be .Net 4.x or earlier!";
             public static readonly GUIContent hdrpAssetLabel = EditorGUIUtility.TrTextContent("Asset configuration");
             public const string hdrpAssetError = "There are issues in the HDRP asset configuration. (see below)";
@@ -328,11 +331,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             EditorGUILayout.EndHorizontal();
 
             ++EditorGUI.indentLevel;
+#if !UNITY_2019_3
             DrawConfigInfoLine(Style.scriptingRuntimeVersionLabel, Style.scriptingRuntimeVersionError, Style.ok, Style.resolve, IsScriptRuntimeVersionCorrect, FixScriptRuntimeVersion);
+#endif
             DrawConfigInfoLine(Style.colorSpaceLabel, Style.colorSpaceError, Style.ok, Style.resolve, IsColorSpaceCorrect, FixColorSpace);
             DrawConfigInfoLine(Style.lightmapLabel, Style.lightmapError, Style.ok, Style.resolveAllBuildTarget, IsLightmapCorrect, FixLightmap);
             DrawConfigInfoLine(Style.shadowLabel, Style.shadowError, Style.ok, Style.resolveAllQuality, IsShadowCorrect, FixShadow);
+#if !UNITY_2019_3
             DrawConfigInfoLine(Style.shadowMaskLabel, Style.shadowMaskError, Style.ok, Style.resolveAllQuality, IsShadowmaskCorrect, FixShadowmask);
+#else
+            DrawConfigInfoLine(Style.shadowMaskLabel, Style.shadowError, Style.ok, Style.resolveAllQuality, IsShadowmaskCorrect, FixShadowmask);
+#endif
             DrawConfigInfoLine(Style.hdrpAssetLabel, Style.hdrpAssetError, Style.ok, Style.resolveAll, IsHdrpAssetCorrect, FixHdrpAsset);
             ++EditorGUI.indentLevel;
             DrawConfigInfoLine(Style.hdrpAssetUsedLabel, Style.hdrpAssetUsedError, Style.ok, Style.resolve, IsHdrpAssetUsedCorrect, FixHdrpAssetUsed);
@@ -418,8 +427,11 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         }
 
         bool IsAllCorrect() =>
+#if !UNITY_2019_3
             IsScriptRuntimeVersionCorrect()
-            && IsLightmapCorrect()
+            &&
+#endif
+            IsLightmapCorrect()
             && IsShadowCorrect()
             && IsShadowmaskCorrect()
             && IsColorSpaceCorrect()
@@ -431,11 +443,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             //Async will allow to make things green when fixed before asking
             //new confirmation to fix elements. It help the user to know which
             //one is currently being adressed
+#if !UNITY_2019_3
             if (!IsScriptRuntimeVersionCorrect())
             {
                 FixScriptRuntimeVersion();
                 return;
             }
+#endif
             if (!IsColorSpaceCorrect())
             {
                 FixColorSpace();
@@ -553,10 +567,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             }
             QualitySettings.SetQualityLevel(currentQuality, applyExpensiveChanges: false);
         }
-
+#if !UNITY_2019_3
         bool IsScriptRuntimeVersionCorrect() => PlayerSettings.scriptingRuntimeVersion == ScriptingRuntimeVersion.Latest;
         void FixScriptRuntimeVersion() => PlayerSettings.scriptingRuntimeVersion = ScriptingRuntimeVersion.Latest;
-
+#endif
         bool IsHdrpAssetUsedCorrect() => GraphicsSettings.renderPipelineAsset != null && GraphicsSettings.renderPipelineAsset is HDRenderPipelineAsset;
         void FixHdrpAssetUsed() => CreateOrLoad<HDRenderPipelineAsset>();
 
